@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-
+const axios = require("axios");
 const { Router } = require("express");
 const { toJWT } = require("../auth/jwt");
 const authMiddleware = require("../auth/middleware");
@@ -46,7 +46,9 @@ router.post("/login", async (req, res, next) => {
 router.post("/signup", async (req, res) => {
   const { email, password, name, scuderia } = req.body;
   if (!email || !password || !name || !scuderia) {
-    return res.status(400).send("Please provide an email, password, name and scuderia");
+    return res
+      .status(400)
+      .send("Please provide an email, password, name and scuderia");
   }
 
   try {
@@ -73,18 +75,24 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+// This router is going to get all F1 realated news.
+// https://newsapi.org/v2/everything?q=apple&from=2021-05-04&to=2021-05-04&sortBy=popularity&apiKey=168611ab2e3d4fbc83964054b839c0c4
+
+router.get("/news", async (req, res) => {
+  const url = `https://newsapi.org/v2/everything?q=%22F1%22and%22Formula%201%22and&%22formula1%22&sortBy=popularity&apiKey=168611ab2e3d4fbc83964054b839c0c4`;
+  const response = await axios.get(url);
+  const articles = response.data.articles;
+  res.status(200).send({ articles });
+});
+
 // The /me endpoint can be used to:
 // - get the users email & name using only their token
 // - checking if a token is (still) valid
-// router.get(
-//   "/me",
-//   // authMiddleware,
-//   async (req, res) => {
-//     // don't send back the password hash
-//     delete req.user.dataValues["password"];
-//     res.status(200).send({ ...req.user.dataValues });
-//   }
-// );
+// router.get("/me", authMiddleware, async (req, res) => {
+//   // don't send back the password hash
+//   delete req.user.dataValues["password"];
+//   res.status(200).send({ ...req.user.dataValues });
+// });
 
 // this router is going to get reserved tables
 // router.get("/reservations/tables/:date", async (req, res) => {
