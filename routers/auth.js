@@ -20,9 +20,17 @@ router.post("/login", async (req, res, next) => {
 
     const user = await User.findOne({ where: { email } });
 
-    if (!user || !bcrypt.compareSync(password, user.password)) {
+    if (!user) {
       return res.status(400).send({
-        message: "User with that email not found or password incorrect",
+        message: "User with that email not found ",
+      });
+    }
+
+    if (!user || bcrypt.compareSync(password, user.password)) {
+      console.log(password, "this is th password"),
+        console.log(user.password, "this is the scrambled thing");
+      return res.status(400).send({
+        message: "password incorrect",
       });
     }
 
