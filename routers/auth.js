@@ -54,7 +54,7 @@ router.post("/signup", async (req, res) => {
   try {
     const newUser = await User.create({
       email,
-      password: bcrypt.hashSync(password, SALT_ROUNDS),
+      password,
       name,
       scuderia,
     });
@@ -78,7 +78,7 @@ router.post("/signup", async (req, res) => {
 // This router is going to get all F1 realated news.
 // https://newsapi.org/v2/everything?q=apple&from=2021-05-04&to=2021-05-04&sortBy=popularity&apiKey=168611ab2e3d4fbc83964054b839c0c4
 
-router.get("/news", async (req, res) => {
+router.get("/news", authMiddleware, async (req, res) => {
   const url = `https://newsapi.org/v2/everything?q=%22F1%22and%22Formula%201%22and&%22formula1%22&sortBy=popularity&apiKey=168611ab2e3d4fbc83964054b839c0c4`;
   const response = await axios.get(url);
   const articles = response.data.articles;
@@ -88,11 +88,11 @@ router.get("/news", async (req, res) => {
 // The /me endpoint can be used to:
 // - get the users email & name using only their token
 // - checking if a token is (still) valid
-// router.get("/me", authMiddleware, async (req, res) => {
-//   // don't send back the password hash
-//   delete req.user.dataValues["password"];
-//   res.status(200).send({ ...req.user.dataValues });
-// });
+router.get("/me", async (req, res) => {
+  // don't send back the password hash
+  delete req.user.dataValues["password"];
+  res.status(200).send({ ...req.user.dataValues });
+});
 
 // this router is going to get reserved tables
 // router.get("/reservations/tables/:date", async (req, res) => {
