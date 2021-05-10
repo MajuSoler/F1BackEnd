@@ -85,6 +85,16 @@ router.get("/news", authMiddleware, async (req, res) => {
   res.status(200).send({ articles });
 });
 
+// router.get("/news/:title", async (req, res) => {
+//   const title = request.params.title;
+//   console.log("this is the title", title);
+//   const url = `https://newsapi.org/v2/everything?qInTitle="${title}"&apiKey=168611ab2e3d4fbc83964054b839c0c4`;
+//   const response = await axios.get(url);
+//   const article = response.data.article;
+//   console.log("this is the article", article);
+//   res.status(200).send({ article });
+// });
+
 // The /me endpoint can be used to:
 // - get the users email & name using only their token
 // - checking if a token is (still) valid
