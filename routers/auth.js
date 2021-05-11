@@ -4,6 +4,8 @@ const { Router } = require("express");
 const { toJWT } = require("../auth/jwt");
 const authMiddleware = require("../auth/middleware");
 const User = require("../models/").user;
+const Comment = require("../models").comment;
+const Article = require("../models/").article;
 const { SALT_ROUNDS } = require("../config/constants");
 
 const router = new Router();
@@ -85,6 +87,25 @@ router.get("/news", authMiddleware, async (req, res) => {
   res.status(200).send({ articles });
 });
 
+// This router is going to get me all the comments stored
+router.get("/comments/:articleurl", async (req, res) => {
+  const articleURL = req.params.articleurl;
+
+  const comments = await Article.findAndCountAll({
+    where: { url: articleURL },
+    include: [{ model: Comment, include: [User] }],
+  });
+  console.log("These are the stored comments", comments);
+  res.status(200).send({ comments });
+});
+
+router.get("/comments", authMiddleware, async (req, res) => {
+  // const url = `https://newsapi.org/v2/everything?q=%22F1%22and%22Formula%201%22and&%22formula1%22&sortBy=popularity&apiKey=168611ab2e3d4fbc83964054b839c0c4`;
+  const response = await axios.get(url);
+  const articles = response.data.articles;
+  res.status(200).send({ articles });
+});
+
 // router.get("/news/:title", async (req, res) => {
 //   const title = request.params.title;
 //   console.log("this is the title", title);
@@ -125,11 +146,11 @@ router.get("/me", async (req, res) => {
 // });
 
 //this gives me all the users
-router.get("/users", async (req, res) => {
-  const Users = await User.findAndCountAll({});
-  console.log("This is the user", Users.rows);
-  res.status(200).send({ message: "oksss", Users });
-});
+// router.get("/users", async (req, res) => {
+//   const Users = await User.findAndCountAll({});
+//   console.log("This is the user", Users.rows);
+//   res.status(200).send({ message: "oksss", Users });
+// });
 
 //this gives me all the reservations
 // router.get("/reservations", authMiddleware, async (req, res) => {

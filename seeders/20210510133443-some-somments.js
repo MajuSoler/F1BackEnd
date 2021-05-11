@@ -6,15 +6,15 @@ module.exports = {
       "comments",
       [
         {
-          user_id: 1,
-          article_id: 1,
+          userId: 1,
+          articleId: 1,
           comment: "This is interesting",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         {
-          user_id: 1,
-          article_id: 1,
+          userId: 1,
+          articleId: 1,
           comment: "This is interesting too!",
           createdAt: new Date(),
           updatedAt: new Date(),
