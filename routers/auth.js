@@ -88,15 +88,56 @@ router.get("/news", authMiddleware, async (req, res) => {
 });
 
 // This router is going to get me all the comments stored
-router.get("/comments/:articleurl", async (req, res) => {
+router.get("/comments/:articleurl", authMiddleware, async (req, res) => {
   const articleURL = req.params.articleurl;
 
   const comments = await Article.findAndCountAll({
     where: { url: articleURL },
     include: [{ model: Comment, include: [User] }],
+    // include: [Comment],
   });
-  console.log("These are the stored comments", comments);
+  console.log("These are the stored comments", comments.rows.dataValues);
   res.status(200).send({ comments });
+});
+
+router.get("/specificarticle/:articleURL", async (req, res) => {
+  const articleURL = req.params.articleURL;
+
+  const deco = decodeURIComponent(articleURL);
+
+  const response = await Article.findAndCountAll({
+    where: { url: deco },
+  });
+
+  if (response.count > 0) {
+    const saved = true;
+    res.status(200).send({ saved });
+  } else {
+    const saved = false;
+    res.status(200).send({ saved });
+  }
+
+  //
+});
+
+router.get("/insertarticle/:articleURL", async (req, res) => {
+  const articleURL = req.params.articleURL;
+
+  const deco = decodeURIComponent(articleURL);
+
+  const response = await Article.findAndCountAll({
+    where: { url: deco },
+  });
+
+  if (response.count > 0) {
+    const saved = true;
+    res.status(200).send({ saved });
+  } else {
+    const saved = false;
+    res.status(200).send({ saved });
+  }
+
+  //
 });
 
 router.get("/comments", authMiddleware, async (req, res) => {
@@ -105,6 +146,117 @@ router.get("/comments", authMiddleware, async (req, res) => {
   const articles = response.data.articles;
   res.status(200).send({ articles });
 });
+
+router.post("/insertarticle", async (req, res) => {
+  const {
+    titleReady,
+    urlReady,
+    descriptionReady,
+    authorReady,
+    contentReady,
+    img_urlReady,
+  } = req.body;
+
+  const decoTitle = decodeURIComponent(titleReady);
+  const decoURL = decodeURIComponent(urlReady);
+  const decoDescription = decodeURIComponent(descriptionReady);
+  const decoAuthor = decodeURIComponent(authorReady);
+  const decoContent = decodeURIComponent(contentReady);
+  const decoImageURL = decodeURIComponent(img_urlReady);
+
+  const newArticle = await Article.create({
+    url: decoURL,
+    author: decoAuthor,
+    title: decoTitle,
+    content: decoContent,
+    img_url: decoImageURL,
+    description: decoDescription,
+  });
+  res.status(201).json({ newArticle });
+  res.status(200).send(console.log("the article was published"));
+
+  //
+});
+
+// router.post(
+//   // "/insertarticle/:encodedurl/:encodedauthor/:encodedtitle/:encodedcontent/:encodedimg_url/:encodeddescription/:token`,",
+//   "/insertarticle/:encodedurl`,",
+//   async (req, res) => {
+//     const url = req.params.encodedurl;
+//     // const decodedurl = decodeURIComponent(url);
+//     console.log(url, " i am the auth");
+
+//     // const decodedauthor = decodeURIComponent(req.params.encodedauthor);
+//     // const decodedauthor = decodeURIComponent(req.params.encodedauthor);
+//     // const decodedtitle = decodeURIComponent(req.params.encodedtitle);
+//     // const decodedcontent = decodeURIComponent(req.params.encodedcontent);
+//     // const decodedimg_url = decodeURIComponent(req.params.encodedimg_url);
+//     // const decodeddescription = decodeURIComponent(
+//     //   req.params.encodeddescription
+//     // );
+//     // const token = req.params.token;
+
+//     // const {
+//     //   url,
+//     //   author,
+//     //   title,
+//     //   content,
+//     //   img_url,
+//     //   description,
+//     //   token,
+//     // } = req.body;
+//     // decodedurl = decodeURIComponent(url);
+//     // decodedauthor = decodeURIComponent(author);
+//     // decodedtitle = decodeURIComponent(title);
+//     // decodedcontent = decodeURIComponent(content);
+//     // decodedimg_url = decodeURIComponent(img_url);
+
+//     console.log(
+//       "I am the url"
+//       // decodedurl
+//       // "I am the author",
+//       // decodedauthor,
+//       // "I am the title",
+//       // decodedtitle,
+//       // "I am the content",
+//       // decodedcontent,
+//       // "I am the image",
+//       // decodedimg_url,
+//       // "I am the description",
+//       // decodeddescription,
+//       // "i am the thoke",
+//       // token
+//     );
+//     if (
+//       !url
+//       // !decodedauthor ||
+//       // !decodedtitle ||
+//       // !decodedcontent ||
+//       // !decodedimg_url ||
+//       // !decodeddescription
+//     ) {
+//       return res
+//         .status(400)
+//         .send(
+//           "Please provide a url, author, title, content, img_url, description"
+//         );
+//     }
+//     try {
+//       await Article.create({
+//         url: url,
+//         author: "teste",
+//         title: "teste",
+//         content: "teste",
+//         img_url: "teste",
+//         description: "teste",
+//       });
+
+//       res.status(201).send({ message: "Everything went well." });
+//     } catch (error) {
+//       return res.status(400).send({ message: "Something went wrong, sorry" });
+//     }
+//   }
+// );
 
 // router.get("/news/:title", async (req, res) => {
 //   const title = request.params.title;
