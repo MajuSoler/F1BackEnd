@@ -88,17 +88,20 @@ router.get("/news", authMiddleware, async (req, res) => {
 });
 
 // This router is going to get me all the comments stored
-router.get("/comments/:articleurl", authMiddleware, async (req, res) => {
+router.get("/allcommentsbtarticle/:articleurl", async (req, res) => {
+  // const { ArticleURL } = req.body;
   const articleURL = req.params.articleurl;
-
+  const deco = decodeURIComponent(articleURL);
+  console.log("i am in the back and i am coded", articleURL);
   const comments = await Article.findAndCountAll({
-    where: { url: articleURL },
+    where: { url: deco },
     include: [{ model: Comment, include: [User] }],
-
-    order: [Comment, "createdAt", "DESC"],
+    // ['Task', 'createdAt', 'DESC'],
+    // order: ["Comment", "createdAt", "ASC"],
   });
-
-  res.status(200).send({ comments });
+  resposta = comments;
+  console.log("These are the stored comments", { resposta });
+  res.status(200).send({ resposta });
 });
 
 router.get("/specificarticle/:articleURL", async (req, res) => {
@@ -142,11 +145,11 @@ router.get("/insertarticle/:articleURL", async (req, res) => {
 });
 
 // this is gonna get me the comments
-router.get("/comments", authMiddleware, async (req, res) => {
-  const response = await axios.get(url);
-  const articles = response.data.articles;
-  res.status(200).send({ articles });
-});
+// router.get("/comments", authMiddleware, async (req, res) => {
+//   const response = await axios.get(url);
+//   const articles = response.data.articles;
+//   res.status(200).send({ articles });
+// });
 
 //This router is gonna post articles for me
 
